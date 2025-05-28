@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { ZoomIn, ZoomOut, TrendingUp, TrendingDown } from 'lucide-react';
 import { CandlestickData } from '@/contexts/PracticeContext';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface CandlestickChartProps {
   data: CandlestickData[];
@@ -188,42 +188,45 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({ data }) => {
       </div>
 
       <div className="p-6">
-        <div style={{ height: '400px', transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis 
-                dataKey="formattedDate" 
-                stroke="#666"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis 
-                yAxisId="accuracy"
-                orientation="left"
-                domain={['dataMin - 5', 'dataMax + 5']}
-                stroke="#666"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => `${value}%`}
-              />
-              <YAxis 
-                yAxisId="volume"
-                orientation="right"
-                stroke="#666"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              
-              {/* Volume bars */}
-              <Bar dataKey="volume" fill="#e5e7eb" yAxisId="volume" opacity={0.3} />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
+        <ScrollArea className="w-full">
+          <div style={{ width: `${Math.max(800, chartData.length * 50)}px`, height: '400px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis 
+                  dataKey="formattedDate" 
+                  stroke="#666"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis 
+                  yAxisId="accuracy"
+                  orientation="left"
+                  domain={['dataMin - 5', 'dataMax + 5']}
+                  stroke="#666"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `${value}%`}
+                />
+                <YAxis 
+                  yAxisId="volume"
+                  orientation="right"
+                  stroke="#666"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                
+                {/* Volume bars */}
+                <Bar dataKey="volume" fill="#e5e7eb" yAxisId="volume" opacity={0.3} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
 
         <div className="mt-6 grid grid-cols-4 gap-4">
           <div className="bg-blue-50 p-4 rounded-lg text-center">

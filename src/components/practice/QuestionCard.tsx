@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Clock, BookOpen } from 'lucide-react';
+import { Clock, BookOpen, Star, Lightbulb } from 'lucide-react';
 import { usePractice } from '@/contexts/PracticeContext';
 
 const QuestionCard: React.FC = () => {
@@ -54,6 +54,30 @@ const QuestionCard: React.FC = () => {
     return `${baseClasses} opacity-50`;
   };
 
+  // Mock data for tags and concept
+  const difficultyLevel = ['Easy', 'Medium', 'Hard'][Math.floor(Math.random() * 3)];
+  const questionSource = ['QBG', 'AI Generated', 'PYQ'][Math.floor(Math.random() * 3)];
+  const conceptName = 'Thermodynamics';
+  const recommendationReason = 'Based on your recent performance, this concept needs practice to improve accuracy';
+
+  const getDifficultyColor = (level: string) => {
+    switch (level) {
+      case 'Easy': return 'bg-green-100 text-green-800 border-green-200';
+      case 'Medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'Hard': return 'bg-red-100 text-red-800 border-red-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getSourceColor = (source: string) => {
+    switch (source) {
+      case 'QBG': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'AI Generated': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'PYQ': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
@@ -68,9 +92,38 @@ const QuestionCard: React.FC = () => {
               <span className="text-sm opacity-90">Unlimited Time</span>
             </div>
           </div>
+          
+          {/* Tags */}
+          <div className="flex items-center gap-3 mb-4">
+            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(difficultyLevel)}`}>
+              {difficultyLevel}
+            </span>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getSourceColor(questionSource)}`}>
+              {questionSource}
+            </span>
+          </div>
+          
           <h2 className="text-xl font-semibold leading-relaxed">
             {state.currentQuestion.text}
           </h2>
+        </div>
+
+        {/* Concept Recommendation Note */}
+        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 m-6 rounded-r-lg">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <Lightbulb className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Star className="w-4 h-4 text-amber-600" />
+                <span className="font-medium text-amber-800">Concept: {conceptName}</span>
+              </div>
+              <p className="text-sm text-amber-700">
+                {recommendationReason}
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="p-6">
