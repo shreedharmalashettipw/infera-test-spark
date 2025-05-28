@@ -1,7 +1,6 @@
-
-import React from 'react';
-import { TrendingUp, Target, Zap } from 'lucide-react';
-import { usePractice } from '@/contexts/PracticeContext';
+import React from "react";
+import { TrendingUp, Target, Zap } from "lucide-react";
+import { usePractice } from "@/contexts/PracticeContext";
 
 const PerformanceStats: React.FC = () => {
   const { state } = usePractice();
@@ -28,7 +27,9 @@ const PerformanceStats: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Current Streak</p>
-              <p className="text-xl font-bold text-gray-900">{state.currentStreak}</p>
+              <p className="text-xl font-bold text-gray-900">
+                {state.currentStreak}
+              </p>
             </div>
           </div>
 
@@ -38,12 +39,14 @@ const PerformanceStats: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Attempted</p>
-              <p className="text-xl font-bold text-gray-900">{state.totalAttempted}</p>
+              <p className="text-xl font-bold text-gray-900">
+                {state.totalAttempted}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="text-right">
+        {/* <div className="text-right">
           <p className="text-sm text-gray-600">Session Progress</p>
           <div className="flex items-center gap-2 mt-1">
             <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -56,7 +59,7 @@ const PerformanceStats: React.FC = () => {
               {state.totalCorrect}/{state.totalAttempted}
             </span>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

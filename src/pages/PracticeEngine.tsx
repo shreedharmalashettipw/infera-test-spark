@@ -1,21 +1,22 @@
-
-import React, { useEffect } from 'react';
-import { usePractice } from '@/contexts/PracticeContext';
-import { Link } from 'react-router-dom';
-import { BarChart3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import FilterBar from '@/components/practice/FilterBar';
-import PerformanceStats from '@/components/practice/PerformanceStats';
-import QuestionCard from '@/components/practice/QuestionCard';
+import React, { useEffect } from "react";
+import { usePractice } from "@/contexts/PracticeContext";
+import { Link } from "react-router-dom";
+import { BarChart3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import FilterBar from "@/components/practice/FilterBar";
+import PerformanceStats from "@/components/practice/PerformanceStats";
+import QuestionCard from "@/components/practice/QuestionCard";
+import { useQueryParam } from "@/hooks/useQueryParam";
 
 const PracticeEngine: React.FC = () => {
-  const { fetchNextQuestion, state } = usePractice();
+  const testId = useQueryParam("testId") as string;
+  const { fetchNextQuestion } = usePractice();
 
   useEffect(() => {
-    if (!state.currentQuestion && !state.isLoading) {
-      fetchNextQuestion();
+    if (testId) {
+      fetchNextQuestion(testId);
     }
-  }, [state.currentQuestion, state.isLoading, fetchNextQuestion]);
+  }, [testId]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -24,8 +25,12 @@ const PracticeEngine: React.FC = () => {
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Infera Practice Engine</h1>
-                <p className="text-gray-600 mt-1">AI-driven infinite test engine for adaptive learning</p>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Beta Version - Practice Engine
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  AI-driven infinite test engine for adaptive learning
+                </p>
               </div>
               <Link to="/analytics">
                 <Button className="flex items-center gap-2">
@@ -35,8 +40,7 @@ const PracticeEngine: React.FC = () => {
               </Link>
             </div>
           </div>
-          
-          <FilterBar />
+          {/* <FilterBar /> */}
           <PerformanceStats />
         </div>
       </div>
