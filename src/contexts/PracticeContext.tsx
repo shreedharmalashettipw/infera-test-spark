@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 
 export interface Subject {
@@ -125,7 +124,42 @@ const PracticeContext = createContext<{
 export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(practiceReducer, initialState);
 
-  // Mock data
+  const generateDummyPerformance = (): PerformanceData[] => {
+    const data: PerformanceData[] = [];
+    const subjects = ['math', 'physics'];
+    const chapters = ['algebra', 'geometry', 'mechanics'];
+    const topics = ['linear-eq', 'quadratic', 'triangles', 'circles', 'motion', 'forces'];
+    
+    // Generate performance data for the last 7 days
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      
+      // Generate 5-15 questions per day
+      const questionsPerDay = Math.floor(Math.random() * 10) + 5;
+      
+      for (let j = 0; j < questionsPerDay; j++) {
+        const timestamp = date.getTime() + (j * 60000 * 15); // 15 minutes apart
+        const correct = Math.random() > 0.3; // 70% accuracy
+        const streak = correct ? Math.floor(Math.random() * 5) + 1 : 0;
+        
+        data.push({
+          timestamp,
+          correct,
+          accuracy: correct ? 100 : 0,
+          streak,
+          subjectId: subjects[Math.floor(Math.random() * subjects.length)],
+          chapterId: chapters[Math.floor(Math.random() * chapters.length)],
+          topicId: topics[Math.floor(Math.random() * topics.length)],
+        });
+      }
+    }
+    
+    return data.sort((a, b) => a.timestamp - b.timestamp);
+  };
+
+  const dummyPerformance = generateDummyPerformance();
+
   const mockSubjects: Subject[] = [
     {
       id: 'math',
