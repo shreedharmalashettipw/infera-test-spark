@@ -40,6 +40,16 @@ export interface PerformanceData {
   topicId: string;
 }
 
+export interface CandlestickData {
+  timestamp: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  date: string;
+}
+
 export interface PracticeState {
   currentQuestion: Question | null;
   selectedFilters: {
@@ -48,6 +58,7 @@ export interface PracticeState {
     topics: string[];
   };
   performance: PerformanceData[];
+  candlestickData: CandlestickData[];
   currentStreak: number;
   totalAttempted: number;
   totalCorrect: number;
@@ -70,6 +81,7 @@ const initialState: PracticeState = {
     topics: [],
   },
   performance: [],
+  candlestickData: [],
   currentStreak: 0,
   totalAttempted: 0,
   totalCorrect: 0,
@@ -130,18 +142,18 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }
     const chapters = ['algebra', 'geometry', 'mechanics'];
     const topics = ['linear-eq', 'quadratic', 'triangles', 'circles', 'motion', 'forces'];
     
-    // Generate performance data for the last 7 days
-    for (let i = 6; i >= 0; i--) {
+    // Generate performance data for the last 30 days
+    for (let i = 29; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       
-      // Generate 5-15 questions per day
-      const questionsPerDay = Math.floor(Math.random() * 10) + 5;
+      // Generate 5-20 questions per day
+      const questionsPerDay = Math.floor(Math.random() * 15) + 5;
       
       for (let j = 0; j < questionsPerDay; j++) {
-        const timestamp = date.getTime() + (j * 60000 * 15); // 15 minutes apart
-        const correct = Math.random() > 0.3; // 70% accuracy
-        const streak = correct ? Math.floor(Math.random() * 5) + 1 : 0;
+        const timestamp = date.getTime() + (j * 60000 * 10); // 10 minutes apart
+        const correct = Math.random() > 0.25; // 75% accuracy
+        const streak = correct ? Math.floor(Math.random() * 8) + 1 : 0;
         
         data.push({
           timestamp,
@@ -158,7 +170,55 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }
     return data.sort((a, b) => a.timestamp - b.timestamp);
   };
 
+  const generateCandlestickData = (): CandlestickData[] => {
+    const data: CandlestickData[] = [];
+    let currentAccuracy = 70; // Starting accuracy
+    
+    // Generate candlestick data for the last 30 days
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      
+      // Generate OHLC data based on accuracy
+      const open = currentAccuracy;
+      const volatility = Math.random() * 20 - 10; // -10 to +10
+      const high = Math.min(100, open + Math.abs(volatility) + Math.random() * 10);
+      const low = Math.max(0, open - Math.abs(volatility) - Math.random() * 10);
+      const close = low + Math.random() * (high - low);
+      
+      currentAccuracy = close; // Next day starts where this day ended
+      
+      data.push({
+        timestamp: date.getTime(),
+        open: Number(open.toFixed(1)),
+        high: Number(high.toFixed(1)),
+        low: Number(low.toFixed(1)),
+        close: Number(close.toFixed(1)),
+        volume: Math.floor(Math.random() * 50) + 10,
+        date: date.toLocaleDateString(),
+      });
+    }
+    
+    return data;
+  };
+
   const dummyPerformance = generateDummyPerformance();
+  const dummyCandlestickData = generateCandlestickData();
+
+  // Update initial state with dummy data
+  React.useEffect(() => {
+    if (state.performance.length === 0) {
+      dummyPerformance.forEach(perf => {
+        dispatch({ type: 'ADD_PERFORMANCE_DATA', payload: perf });
+      });
+      
+      // Add candlestick data to state
+      dispatch({ 
+        type: 'SET_LOADING', 
+        payload: false 
+      });
+    }
+  }, []);
 
   const mockSubjects: Subject[] = [
     {
@@ -270,8 +330,14 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }
     }, 1000);
   };
 
+  // Create state with dummy candlestick data
+  const stateWithData = {
+    ...state,
+    candlestickData: dummyCandlestickData,
+  };
+
   return (
-    <PracticeContext.Provider value={{ state, dispatch, fetchNextQuestion, submitAnswer }}>
+    <PracticeContext.Provider value={{ state: stateWithData, dispatch, fetchNextQuestion, submitAnswer }}>
       {children}
     </PracticeContext.Provider>
   );

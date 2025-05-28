@@ -2,6 +2,7 @@
 import React from 'react';
 import { usePractice } from '@/contexts/PracticeContext';
 import TradingViewChart from '@/components/analytics/TradingViewChart';
+import CandlestickChart from '@/components/analytics/CandlestickChart';
 import { ArrowLeft, BarChart3, TrendingUp, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -75,6 +76,7 @@ const Analytics: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
             <div className="flex items-center gap-3">
@@ -125,12 +127,18 @@ const Analytics: React.FC = () => {
           </div>
         </div>
 
+        {/* Candlestick Chart */}
+        <div className="mb-8">
+          <CandlestickChart data={state.candlestickData} />
+        </div>
+
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <div className="xl:col-span-2">
             <TradingViewChart data={chartData} />
           </div>
 
           <div className="space-y-6">
+            {/* Subject Performance */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
               <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">Subject Performance</h3>
@@ -168,6 +176,7 @@ const Analytics: React.FC = () => {
               </div>
             </div>
 
+            {/* Recent Activity */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
               <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
