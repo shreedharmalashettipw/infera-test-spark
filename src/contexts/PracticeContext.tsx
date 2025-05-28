@@ -25,6 +25,14 @@ export type OptionType = {
   isCorrect: boolean;
 };
 
+export type ProgressType = {
+  accuracy: number;
+  attemptedQuestions: number;
+  correctQuestions: number;
+  currentStreak: number;
+  inCorrectQuestions: number;
+};
+
 export interface Question {
   id: string;
   questionNumber: number;
@@ -41,6 +49,7 @@ export interface Question {
   canBeCompleted: boolean;
   type: string;
   journeyItemId: string;
+  progress: ProgressType;
 }
 
 export interface PerformanceData {

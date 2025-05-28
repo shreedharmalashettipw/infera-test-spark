@@ -12,13 +12,43 @@ const lessons = [
 
 function JourneyScreen() {
   return (
-    <div className="bg-white py-6 px-4 overflow-y-auto h-[800px]">
-      {/* Curved Path Container */}
-      <div className="relative w-full max-w-3xl mx-auto mt-16" style={{}}>
-        {/* Lesson Nodes */}
+    <div className="px-20">
+      <h3 className="text-3xl font-bold text-center flex items-center gap-2 mt-6">
+        <span className="text-blue-500">🚀</span> {/* Icon */}
+        Journey
+      </h3>
+      <div className="relative w-full max-w-4xl mx-auto">
+        <svg
+          className="absolute w-full h-full"
+          style={{ zIndex: -1 }}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {lessons.map((_, index) => {
+            if (index === lessons.length - 1) return null; // Skip the last circle
+            const startX =
+              index % 2 === 0 ? 300 : window.innerWidth - 300 - 112; // Adjust for circle size
+            const endX =
+              (index + 1) % 2 === 0 ? 300 : window.innerWidth - 300 - 112;
+            const startY = 20 + index * 120 + 56; // Center of the current circle
+            const endY = 20 + (index + 1) * 120 + 56; // Center of the next circle
+
+            return (
+              <path
+                key={index}
+                d={`M${startX},${startY} C${startX},${
+                  (startY + endY) / 2
+                } ${endX},${(startY + endY) / 2} ${endX},${endY}`}
+                stroke="gray"
+                strokeWidth="2"
+                strokeDasharray="5,5"
+                fill="none"
+              />
+            );
+          })}
+        </svg>
         {lessons.map((lesson, index) => {
           // calculate vertical position
-          const top = 20 + index * 90;
+          const top = 20 + index * 120; // Adjusted spacing for larger circles
           const isLeft = index % 2 === 0;
           return (
             <Link
@@ -29,12 +59,13 @@ function JourneyScreen() {
                 key={index}
                 className="absolute"
                 style={{ top: top, [isLeft ? "left" : "right"]: 300 }}
-                onClick={() => console.log("button cliked", index)}
+                onClick={() => console.log("button clicked", index)}
               >
                 <div
-                  className={`w-20 h-20 ${lesson.bg} rounded-full flex items-center justify-center text-white text-2xl shadow-md`}
+                  className={`w-28 h-28 ${lesson.bg} rounded-full flex flex-col items-center justify-center text-white text-2xl shadow-md`}
                 >
-                  {lesson.icon}
+                  <span>{lesson.icon}</span>
+                  <span className="text-sm mt-1">Day {index + 1}</span>
                 </div>
               </div>
             </Link>

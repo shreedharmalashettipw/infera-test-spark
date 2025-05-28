@@ -50,7 +50,7 @@ const QuestionCard: React.FC = () => {
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5" />
               <span className="text-sm opacity-90">
-                Question {state.totalAttempted + 1}
+                Question {currentQuestion.questionNumber}
               </span>
             </div>
             <div className="flex items-center gap-2">
