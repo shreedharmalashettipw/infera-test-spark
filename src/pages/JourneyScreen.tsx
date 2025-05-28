@@ -17,7 +17,14 @@ function JourneyScreen() {
         <span className="text-blue-500">🚀</span> {/* Icon */}
         Journey
       </h3>
-      <div className="relative w-full max-w-4xl mx-auto">
+      <div className="flex justify-end mt-4">
+        <Link to="/leaderboard">
+          <button className="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-200">
+            Leaderboard
+          </button>
+        </Link>
+      </div>
+      <div className="relative w-full max-w-4xl mx-auto mt-8">
         <svg
           className="absolute w-full h-full"
           style={{ zIndex: -1 }}
