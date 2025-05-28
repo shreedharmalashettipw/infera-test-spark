@@ -20,7 +20,7 @@ export interface Topic {
 }
 
 export type OptionType = {
-  _id: string;
+  id: string;
   text: string | number;
   isCorrect: boolean;
 };
@@ -38,6 +38,9 @@ export interface Question {
   source: string;
   aiNote: string;
   concept: string;
+  canBeCompleted: boolean;
+  type: string;
+  journeyItemId: string;
 }
 
 export interface PerformanceData {
@@ -262,7 +265,6 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
             testId,
           },
           headers: {
-            userid: "{{userId}}", // Replace with actual userId value or pass dynamically
             Authorization:
               "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDkwMzAwMjYuNjA2LCJkYXRhIjp7Il9pZCI6IjY1YThlM2NhNDM2NzQ5NmNlNjVjMTU4MSIsInVzZXJuYW1lIjoiNzk4MjE3MzUyMyIsImZpcnN0TmFtZSI6IlJhamEiLCJsYXN0TmFtZSI6IkJoYW5kYXJkZSIsIm9yZ2FuaXphdGlvbiI6eyJfaWQiOiI1ZWIzOTNlZTk1ZmFiNzQ2OGE3OWQxODkiLCJ3ZWJzaXRlIjoicGh5c2ljc3dhbGxhaC5jb20iLCJuYW1lIjoiUGh5c2ljc3dhbGxhaCJ9LCJlbWFpbCI6InJhamFAcHcubGl2ZSIsInJvbGVzIjpbIjViMmI5NzQyNzY0YmQ1MTliZWI5MGFjMiJdLCJjb3VudHJ5R3JvdXAiOiJJTiIsInR5cGUiOiJVU0VSIn0sImlhdCI6MTc0ODQyNTIyNn0.OKNVRduYPzxVN0L40_Vm9ARN5wXZfbAcnXvsk4PbIQs",
           },
@@ -290,8 +292,57 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const getSubmitPayload = (data: Question, answerIndex: number) => {
+    const {
+      questionNumber,
+      text,
+      difficulty,
+      source,
+      type,
+      aiNote,
+      concept,
+      options,
+      canBeCompleted,
+      journeyItemId,
+    } = data;
+
+    const isCorrect = answerIndex === data.correctAnswer;
+
+    return {
+      questionNumber,
+      text,
+      difficulty,
+      source,
+      type,
+      aiNote,
+      concept,
+      options,
+      status: isCorrect ? "Correct" : "Incorrect",
+      selectedOptions: [options[answerIndex].id],
+      completeJourneyItem: canBeCompleted ? journeyItemId : null,
+    };
+  };
+
   const submitAnswer = async (answerIndex: number) => {
     if (!state.currentQuestion) return;
+
+    const submitPayload = getSubmitPayload(state.currentQuestion, answerIndex);
+    try {
+      const response = await axios.post(
+        "https://stage-api.penpencil.co/v3/test-service/infera-practice/submit-question",
+        submitPayload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDkwMzAwMjYuNjA2LCJkYXRhIjp7Il9pZCI6IjY1YThlM2NhNDM2NzQ5NmNlNjVjMTU4MSIsInVzZXJuYW1lIjoiNzk4MjE3MzUyMyIsImZpcnN0TmFtZSI6IlJhamEiLCJsYXN0TmFtZSI6IkJoYW5kYXJkZSIsIm9yZ2FuaXphdGlvbiI6eyJfaWQiOiI1ZWIzOTNlZTk1ZmFiNzQ2OGE3OWQxODkiLCJ3ZWJzaXRlIjoicGh5c2ljc3dhbGxhaC5jb20iLCJuYW1lIjoiUGh5c2ljc3dhbGxhaCJ9LCJlbWFpbCI6InJhamFAcHcubGl2ZSIsInJvbGVzIjpbIjViMmI5NzQyNzY0YmQ1MTliZWI5MGFjMiJdLCJjb3VudHJ5R3JvdXAiOiJJTiIsInR5cGUiOiJVU0VSIn0sImlhdCI6MTc0ODQyNTIyNn0.OKNVRduYPzxVN0L40_Vm9ARN5wXZfbAcnXvsk4PbIQs",
+          },
+        }
+      );
+      console.log("Submit response:", response.data);
+    } catch (error) {
+      console.error("Error submitting question:", error);
+    }
 
     const isCorrect = answerIndex === state.currentQuestion.correctAnswer;
     const newStreak = isCorrect ? state.currentStreak + 1 : 0;
