@@ -200,6 +200,8 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({ data }) => {
                 axisLine={false}
               />
               <YAxis 
+                yAxisId="accuracy"
+                orientation="left"
                 domain={['dataMin - 5', 'dataMax + 5']}
                 stroke="#666"
                 fontSize={12}
@@ -207,20 +209,18 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({ data }) => {
                 axisLine={false}
                 tickFormatter={(value) => `${value}%`}
               />
+              <YAxis 
+                yAxisId="volume"
+                orientation="right"
+                stroke="#666"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
               <Tooltip content={<CustomTooltip />} />
               
               {/* Volume bars */}
               <Bar dataKey="volume" fill="#e5e7eb" yAxisId="volume" opacity={0.3} />
-              
-              {/* Candlesticks */}
-              {chartData.map((item, index) => (
-                <Bar
-                  key={index}
-                  dataKey={() => item.high - item.low}
-                  fill="transparent"
-                  stroke="transparent"
-                />
-              ))}
             </ComposedChart>
           </ResponsiveContainer>
         </div>
