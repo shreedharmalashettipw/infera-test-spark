@@ -1,0 +1,38 @@
+
+import React, { useEffect } from 'react';
+import { usePractice } from '@/contexts/PracticeContext';
+import FilterBar from '@/components/practice/FilterBar';
+import PerformanceStats from '@/components/practice/PerformanceStats';
+import QuestionCard from '@/components/practice/QuestionCard';
+
+const PracticeEngine: React.FC = () => {
+  const { fetchNextQuestion, state } = usePractice();
+
+  useEffect(() => {
+    if (!state.currentQuestion && !state.isLoading) {
+      fetchNextQuestion();
+    }
+  }, [state.currentQuestion, state.isLoading, fetchNextQuestion]);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h1 className="text-2xl font-bold text-gray-900">Infera Practice Engine</h1>
+            <p className="text-gray-600 mt-1">AI-driven infinite test engine for adaptive learning</p>
+          </div>
+          
+          <FilterBar />
+          <PerformanceStats />
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto py-8">
+        <QuestionCard />
+      </div>
+    </div>
+  );
+};
+
+export default PracticeEngine;
