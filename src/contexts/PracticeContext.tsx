@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-
+import React, { createContext, useContext, useReducer, ReactNode } from "react";
+import axios from "axios";
 export interface Subject {
   id: string;
   name: string;
@@ -19,15 +19,25 @@ export interface Topic {
   chapterId: string;
 }
 
+export type OptionType = {
+  _id: string;
+  text: string | number;
+  isCorrect: boolean;
+};
+
 export interface Question {
   id: string;
+  questionNumber: number;
   text: string;
-  options: string[];
+  options: OptionType[];
   correctAnswer: number;
   subjectId: string;
   chapterId: string;
   topicId: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: string;
+  source: string;
+  aiNote: string;
+  concept: string;
 }
 
 export interface PerformanceData {
@@ -67,11 +77,14 @@ export interface PracticeState {
 }
 
 type PracticeAction =
-  | { type: 'SET_CURRENT_QUESTION'; payload: Question }
-  | { type: 'UPDATE_FILTERS'; payload: Partial<PracticeState['selectedFilters']> }
-  | { type: 'ADD_PERFORMANCE_DATA'; payload: PerformanceData }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'RESET_PRACTICE' };
+  | { type: "SET_CURRENT_QUESTION"; payload: Question }
+  | {
+      type: "UPDATE_FILTERS";
+      payload: Partial<PracticeState["selectedFilters"]>;
+    }
+  | { type: "ADD_PERFORMANCE_DATA"; payload: PerformanceData }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "RESET_PRACTICE" };
 
 const initialState: PracticeState = {
   currentQuestion: null,
@@ -89,23 +102,27 @@ const initialState: PracticeState = {
   isLoading: false,
 };
 
-const practiceReducer = (state: PracticeState, action: PracticeAction): PracticeState => {
+const practiceReducer = (
+  state: PracticeState,
+  action: PracticeAction
+): PracticeState => {
   switch (action.type) {
-    case 'SET_CURRENT_QUESTION':
+    case "SET_CURRENT_QUESTION":
       return { ...state, currentQuestion: action.payload };
-    
-    case 'UPDATE_FILTERS':
+
+    case "UPDATE_FILTERS":
       return {
         ...state,
         selectedFilters: { ...state.selectedFilters, ...action.payload },
       };
-    
-    case 'ADD_PERFORMANCE_DATA':
+
+    case "ADD_PERFORMANCE_DATA":
       const newPerformance = [...state.performance, action.payload];
       const totalAttempted = newPerformance.length;
-      const totalCorrect = newPerformance.filter(p => p.correct).length;
-      const overallAccuracy = totalAttempted > 0 ? (totalCorrect / totalAttempted) * 100 : 0;
-      
+      const totalCorrect = newPerformance.filter((p) => p.correct).length;
+      const overallAccuracy =
+        totalAttempted > 0 ? (totalCorrect / totalAttempted) * 100 : 0;
+
       return {
         ...state,
         performance: newPerformance,
@@ -114,13 +131,13 @@ const practiceReducer = (state: PracticeState, action: PracticeAction): Practice
         totalCorrect,
         overallAccuracy,
       };
-    
-    case 'SET_LOADING':
+
+    case "SET_LOADING":
       return { ...state, isLoading: action.payload };
-    
-    case 'RESET_PRACTICE':
+
+    case "RESET_PRACTICE":
       return initialState;
-    
+
     default:
       return state;
   }
@@ -129,32 +146,41 @@ const practiceReducer = (state: PracticeState, action: PracticeAction): Practice
 const PracticeContext = createContext<{
   state: PracticeState;
   dispatch: React.Dispatch<PracticeAction>;
-  fetchNextQuestion: () => Promise<void>;
+  fetchNextQuestion: (testId: string) => Promise<void>;
   submitAnswer: (answerIndex: number) => Promise<void>;
 } | null>(null);
 
-export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(practiceReducer, initialState);
 
   const generateDummyPerformance = (): PerformanceData[] => {
     const data: PerformanceData[] = [];
-    const subjects = ['math', 'physics'];
-    const chapters = ['algebra', 'geometry', 'mechanics'];
-    const topics = ['linear-eq', 'quadratic', 'triangles', 'circles', 'motion', 'forces'];
-    
+    const subjects = ["math", "physics"];
+    const chapters = ["algebra", "geometry", "mechanics"];
+    const topics = [
+      "linear-eq",
+      "quadratic",
+      "triangles",
+      "circles",
+      "motion",
+      "forces",
+    ];
+
     // Generate performance data for the last 30 days
     for (let i = 29; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      
+
       // Generate 5-20 questions per day
       const questionsPerDay = Math.floor(Math.random() * 15) + 5;
-      
+
       for (let j = 0; j < questionsPerDay; j++) {
-        const timestamp = date.getTime() + (j * 60000 * 10); // 10 minutes apart
+        const timestamp = date.getTime() + j * 60000 * 10; // 10 minutes apart
         const correct = Math.random() > 0.25; // 75% accuracy
         const streak = correct ? Math.floor(Math.random() * 8) + 1 : 0;
-        
+
         data.push({
           timestamp,
           correct,
@@ -166,28 +192,31 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }
         });
       }
     }
-    
+
     return data.sort((a, b) => a.timestamp - b.timestamp);
   };
 
   const generateCandlestickData = (): CandlestickData[] => {
     const data: CandlestickData[] = [];
     let currentAccuracy = 70; // Starting accuracy
-    
+
     // Generate candlestick data for the last 30 days
     for (let i = 29; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      
+
       // Generate OHLC data based on accuracy
       const open = currentAccuracy;
       const volatility = Math.random() * 20 - 10; // -10 to +10
-      const high = Math.min(100, open + Math.abs(volatility) + Math.random() * 10);
+      const high = Math.min(
+        100,
+        open + Math.abs(volatility) + Math.random() * 10
+      );
       const low = Math.max(0, open - Math.abs(volatility) - Math.random() * 10);
       const close = low + Math.random() * (high - low);
-      
+
       currentAccuracy = close; // Next day starts where this day ended
-      
+
       data.push({
         timestamp: date.getTime(),
         open: Number(open.toFixed(1)),
@@ -198,7 +227,7 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }
         date: date.toLocaleDateString(),
       });
     }
-    
+
     return data;
   };
 
@@ -208,102 +237,57 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }
   // Update initial state with dummy data
   React.useEffect(() => {
     if (state.performance.length === 0) {
-      dummyPerformance.forEach(perf => {
-        dispatch({ type: 'ADD_PERFORMANCE_DATA', payload: perf });
+      dummyPerformance.forEach((perf) => {
+        dispatch({ type: "ADD_PERFORMANCE_DATA", payload: perf });
       });
-      
+
       // Add candlestick data to state
-      dispatch({ 
-        type: 'SET_LOADING', 
-        payload: false 
+      dispatch({
+        type: "SET_LOADING",
+        payload: false,
       });
     }
   }, []);
 
-  const mockSubjects: Subject[] = [
-    {
-      id: 'math',
-      name: 'Mathematics',
-      chapters: [
-        {
-          id: 'algebra',
-          name: 'Algebra',
-          subjectId: 'math',
-          topics: [
-            { id: 'linear-eq', name: 'Linear Equations', chapterId: 'algebra' },
-            { id: 'quadratic', name: 'Quadratic Equations', chapterId: 'algebra' },
-          ],
-        },
-        {
-          id: 'geometry',
-          name: 'Geometry',
-          subjectId: 'math',
-          topics: [
-            { id: 'triangles', name: 'Triangles', chapterId: 'geometry' },
-            { id: 'circles', name: 'Circles', chapterId: 'geometry' },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'physics',
-      name: 'Physics',
-      chapters: [
-        {
-          id: 'mechanics',
-          name: 'Mechanics',
-          subjectId: 'physics',
-          topics: [
-            { id: 'motion', name: 'Motion', chapterId: 'mechanics' },
-            { id: 'forces', name: 'Forces', chapterId: 'mechanics' },
-          ],
-        },
-      ],
-    },
-  ];
+  const fetchNextQuestion = async (testId: string) => {
+    dispatch({ type: "SET_LOADING", payload: true });
+    dispatch({ type: "SET_CURRENT_QUESTION", payload: null });
 
-  const mockQuestions: Question[] = [
-    {
-      id: '1',
-      text: 'What is the value of x in the equation 2x + 5 = 15?',
-      options: ['3', '5', '7', '10'],
-      correctAnswer: 1,
-      subjectId: 'math',
-      chapterId: 'algebra',
-      topicId: 'linear-eq',
-      difficulty: 'easy',
-    },
-    {
-      id: '2',
-      text: 'What is the area of a circle with radius 3?',
-      options: ['6π', '9π', '12π', '18π'],
-      correctAnswer: 1,
-      subjectId: 'math',
-      chapterId: 'geometry',
-      topicId: 'circles',
-      difficulty: 'medium',
-    },
-    {
-      id: '3',
-      text: 'What is the acceleration due to gravity on Earth?',
-      options: ['9.8 m/s²', '10 m/s²', '8.9 m/s²', '11 m/s²'],
-      correctAnswer: 0,
-      subjectId: 'physics',
-      chapterId: 'mechanics',
-      topicId: 'motion',
-      difficulty: 'easy',
-    },
-  ];
+    try {
+      // Replace 'API_URL' with the actual endpoint for fetching the next question
+      const response = await axios.get(
+        "https://stage-api.penpencil.co/v3/test-service/test-categories/infera-practice/next-question",
+        {
+          params: {
+            testId,
+          },
+          headers: {
+            userid: "{{userId}}", // Replace with actual userId value or pass dynamically
+            Authorization:
+              "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDkwMzAwMjYuNjA2LCJkYXRhIjp7Il9pZCI6IjY1YThlM2NhNDM2NzQ5NmNlNjVjMTU4MSIsInVzZXJuYW1lIjoiNzk4MjE3MzUyMyIsImZpcnN0TmFtZSI6IlJhamEiLCJsYXN0TmFtZSI6IkJoYW5kYXJkZSIsIm9yZ2FuaXphdGlvbiI6eyJfaWQiOiI1ZWIzOTNlZTk1ZmFiNzQ2OGE3OWQxODkiLCJ3ZWJzaXRlIjoicGh5c2ljc3dhbGxhaC5jb20iLCJuYW1lIjoiUGh5c2ljc3dhbGxhaCJ9LCJlbWFpbCI6InJhamFAcHcubGl2ZSIsInJvbGVzIjpbIjViMmI5NzQyNzY0YmQ1MTliZWI5MGFjMiJdLCJjb3VudHJ5R3JvdXAiOiJJTiIsInR5cGUiOiJVU0VSIn0sImlhdCI6MTc0ODQyNTIyNn0.OKNVRduYPzxVN0L40_Vm9ARN5wXZfbAcnXvsk4PbIQs",
+          },
+        }
+      );
 
-  const fetchNextQuestion = async () => {
-    dispatch({ type: 'SET_LOADING', payload: true });
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const randomQuestion = mockQuestions[Math.floor(Math.random() * mockQuestions.length)];
-    dispatch({ type: 'SET_CURRENT_QUESTION', payload: randomQuestion });
-    dispatch({ type: 'SET_LOADING', payload: false });
+      const data = response.data?.data;
+      const getCorrectAnswerIndex = (options): number => {
+        return options.findIndex((option) => option.isCorrect);
+      };
+
+      if (data) {
+        const question: Question = {
+          ...data,
+          correctAnswer: getCorrectAnswerIndex(data.options),
+        };
+
+        dispatch({ type: "SET_CURRENT_QUESTION", payload: question });
+      }
+    } catch (error) {
+      console.error("Error fetching the next question:", error);
+      // Handle error (e.g., show a notification or set an error state)
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   };
 
   const submitAnswer = async (answerIndex: number) => {
@@ -311,7 +295,7 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     const isCorrect = answerIndex === state.currentQuestion.correctAnswer;
     const newStreak = isCorrect ? state.currentStreak + 1 : 0;
-    
+
     const performanceData: PerformanceData = {
       timestamp: Date.now(),
       correct: isCorrect,
@@ -322,12 +306,7 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }
       topicId: state.currentQuestion.topicId,
     };
 
-    dispatch({ type: 'ADD_PERFORMANCE_DATA', payload: performanceData });
-    
-    // Auto-fetch next question after a short delay
-    setTimeout(() => {
-      fetchNextQuestion();
-    }, 1000);
+    dispatch({ type: "ADD_PERFORMANCE_DATA", payload: performanceData });
   };
 
   // Create state with dummy candlestick data
@@ -337,7 +316,14 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   return (
-    <PracticeContext.Provider value={{ state: stateWithData, dispatch, fetchNextQuestion, submitAnswer }}>
+    <PracticeContext.Provider
+      value={{
+        state: stateWithData,
+        dispatch,
+        fetchNextQuestion,
+        submitAnswer,
+      }}
+    >
       {children}
     </PracticeContext.Provider>
   );
@@ -346,7 +332,7 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({ children }
 export const usePractice = () => {
   const context = useContext(PracticeContext);
   if (!context) {
-    throw new Error('usePractice must be used within a PracticeProvider');
+    throw new Error("usePractice must be used within a PracticeProvider");
   }
   return context;
 };
