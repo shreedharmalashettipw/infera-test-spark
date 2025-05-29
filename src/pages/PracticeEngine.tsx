@@ -8,6 +8,7 @@ import FilterBar from "@/components/practice/FilterBar";
 import PerformanceStats from "@/components/practice/PerformanceStats";
 import QuestionCard from "@/components/practice/QuestionCard";
 import JourneyProgressBar from "@/components/practice/JourneyProgressBar";
+import FeedbackButton from "@/components/practice/FeedbackButton";
 import { useQueryParam } from "@/hooks/useQueryParam";
 
 const PracticeEngine: React.FC = () => {
@@ -19,6 +20,12 @@ const PracticeEngine: React.FC = () => {
       fetchNextQuestion(testId);
     }
   }, [testId]);
+
+  const handleFeedbackSubmit = (feedback: string) => {
+    console.log("User feedback:", feedback);
+    // TODO: Send feedback to your API endpoint
+    // This will be integrated with your feedback API
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -53,6 +60,9 @@ const PracticeEngine: React.FC = () => {
       <div className="max-w-7xl mx-auto py-8">
         <QuestionCard />
       </div>
+
+      {/* Feedback Button */}
+      <FeedbackButton onSubmitFeedback={handleFeedbackSubmit} />
     </div>
   );
 };
