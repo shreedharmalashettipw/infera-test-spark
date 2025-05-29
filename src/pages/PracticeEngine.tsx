@@ -135,7 +135,14 @@ const PracticeEngine: React.FC = () => {
             )}
           </div>
         )}
-        <div className="w-[70%]">
+        <div
+          style={{
+            width:
+              currentJourneyItem || completedJourneyItems?.length > 0
+                ? "70%"
+                : "100%",
+          }}
+        >
           {currentJourneyItem && (
             <div className="text-sm text-gray-600 mb-4">
               The question displayed below is related to the concept:{" "}
@@ -144,11 +151,7 @@ const PracticeEngine: React.FC = () => {
               </span>
             </div>
           )}
-          <QuestionCard
-          // isCurrentJourneyItemShown={
-          //   currentJourneyItem || completedJourneyItems?.length > 0
-          // }
-          />
+          <QuestionCard />
         </div>
       </div>
 
