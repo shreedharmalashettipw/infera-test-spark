@@ -1,5 +1,12 @@
 import React from "react";
-import { TrendingUp, Target, Zap, CheckCircle, XCircle } from "lucide-react";
+import {
+  TrendingUp,
+  Target,
+  Zap,
+  CheckCircle,
+  XCircle,
+  Trophy,
+} from "lucide-react"; // Added Trophy icon
 import { usePractice } from "@/contexts/PracticeContext";
 
 const PerformanceStats: React.FC = () => {
@@ -14,6 +21,7 @@ const PerformanceStats: React.FC = () => {
     correctQuestions,
     currentStreak,
     inCorrectQuestions,
+    maxStreak,
   } = currentQuestion.progress;
 
   return (
@@ -80,6 +88,17 @@ const PerformanceStats: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">Current Streak</p>
               <p className="text-xl font-bold text-gray-900">{currentStreak}</p>
+            </div>
+          </div>
+
+          {/* Max Streak */}
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <Trophy className="w-5 h-5 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Max Streak</p>
+              <p className="text-xl font-bold text-gray-900">{maxStreak}</p>
             </div>
           </div>
         </div>
