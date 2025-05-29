@@ -1,16 +1,18 @@
-
 import React, { useState, useRef } from "react";
 import { Mic, MicOff, MessageSquare, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { usePractice } from "@/contexts/PracticeContext";
 import { useQueryParam } from "@/hooks/useQueryParam";
+import ReactTooltip from "react-tooltip";
 
 interface FeedbackButtonProps {
   onSubmitFeedback: (feedback: string) => void;
 }
 
-const FeedbackButton: React.FC<FeedbackButtonProps> = ({ onSubmitFeedback }) => {
+const FeedbackButton: React.FC<FeedbackButtonProps> = ({
+  onSubmitFeedback,
+}) => {
   const testId = useQueryParam("testId") as string;
   const { fetchNextQuestion } = usePractice();
   const [isOpen, setIsOpen] = useState(false);
@@ -32,16 +34,18 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ onSubmitFeedback }) => 
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/wav",
+        });
         await convertToText(audioBlob);
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
-      console.error('Error accessing microphone:', error);
-      alert('Could not access microphone. Please check permissions.');
+      console.error("Error accessing microphone:", error);
+      alert("Could not access microphone. Please check permissions.");
     }
   };
 
@@ -56,28 +60,32 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ onSubmitFeedback }) => 
     setIsLoading(true);
     try {
       // Using Web Speech API for speech-to-text
-      const recognition = new (window as any).webkitSpeechRecognition() || new (window as any).SpeechRecognition();
+      const recognition =
+        new (window as any).webkitSpeechRecognition() ||
+        new (window as any).SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = 'en-US';
+      recognition.lang = "en-US";
 
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
-        setFeedbackText(prev => prev + ' ' + transcript);
+        setFeedbackText((prev) => prev + " " + transcript);
         setIsLoading(false);
       };
 
       recognition.onerror = () => {
-        console.error('Speech recognition error');
+        console.error("Speech recognition error");
         setIsLoading(false);
-        alert('Speech recognition failed. Please type your feedback instead.');
+        alert("Speech recognition failed. Please type your feedback instead.");
       };
 
       recognition.start();
     } catch (error) {
-      console.error('Speech recognition not supported:', error);
+      console.error("Speech recognition not supported:", error);
       setIsLoading(false);
-      alert('Speech recognition not supported in this browser. Please type your feedback instead.');
+      alert(
+        "Speech recognition not supported in this browser. Please type your feedback instead."
+      );
     }
   };
 
@@ -86,7 +94,7 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ onSubmitFeedback }) => 
       onSubmitFeedback(feedbackText.trim());
       setFeedbackText("");
       setIsOpen(false);
-      
+
       // Fetch next question after submitting feedback
       if (testId) {
         await fetchNextQuestion(testId, feedbackText.trim());
@@ -111,14 +119,16 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ onSubmitFeedback }) => 
         className="fixed bottom-6 right-6 z-50 shadow-lg"
       >
         <MessageSquare className="w-4 h-4 mr-2" />
-        Feedback
+        Infero Mentor
       </Button>
 
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Share Your Feedback</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Share Your Feedback
+              </h3>
               <Button variant="ghost" size="sm" onClick={handleClose}>
                 <X className="w-4 h-4" />
               </Button>
@@ -146,7 +156,9 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ onSubmitFeedback }) => 
                   )}
                 </Button>
                 {isLoading && (
-                  <span className="text-sm text-gray-600">Converting speech to text...</span>
+                  <span className="text-sm text-gray-600">
+                    Converting speech to text...
+                  </span>
                 )}
               </div>
 
@@ -162,7 +174,7 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ onSubmitFeedback }) => 
                 <Button variant="outline" onClick={handleClose}>
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   onClick={handleSubmit}
                   disabled={!feedbackText.trim() || isLoading}
                 >

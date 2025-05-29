@@ -26,7 +26,9 @@ const QuestionCard: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
-  const [pendingAnswerIndex, setPendingAnswerIndex] = useState<number | null>(null);
+  const [pendingAnswerIndex, setPendingAnswerIndex] = useState<number | null>(
+    null
+  );
 
   if (!currentQuestion) {
     return (
@@ -58,7 +60,7 @@ const QuestionCard: React.FC = () => {
 
   const handleCompleteJourney = async () => {
     if (pendingAnswerIndex === null) return;
-    
+
     setShowCompletionDialog(false);
     setShowResult(true);
     await submitAnswer(pendingAnswerIndex, true);
@@ -67,7 +69,7 @@ const QuestionCard: React.FC = () => {
 
   const handleSkipCompletion = async () => {
     if (pendingAnswerIndex === null) return;
-    
+
     setShowCompletionDialog(false);
     setShowResult(true);
     await submitAnswer(pendingAnswerIndex, false);
@@ -82,7 +84,7 @@ const QuestionCard: React.FC = () => {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6">
             <div className="flex items-center justify-between mb-4">
@@ -134,7 +136,9 @@ const QuestionCard: React.FC = () => {
                     Concept: {currentQuestion.concept}
                   </span>
                 </div>
-                <p className="text-sm text-amber-700">{currentQuestion.aiNote}</p>
+                <p className="text-sm text-amber-700">
+                  {currentQuestion.aiNote}
+                </p>
               </div>
             </div>
           </div>
@@ -195,12 +199,16 @@ const QuestionCard: React.FC = () => {
         </div>
       </div>
 
-      <AlertDialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
+      <AlertDialog
+        open={showCompletionDialog}
+        onOpenChange={setShowCompletionDialog}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Complete Journey Item?</AlertDialogTitle>
             <AlertDialogDescription>
-              You've mastered this concept! Would you like to mark this journey item as completed?
+              You've mastered this concept! Would you like to mark this journey
+              item as completed?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
