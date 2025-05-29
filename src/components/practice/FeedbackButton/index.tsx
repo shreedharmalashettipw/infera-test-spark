@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Mic, MicOff, MessageSquare, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,6 +21,32 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const [typedText, setTypedText] = useState("");
+
+  const typingText =
+    "Choose topics, difficulty, or question type. I will generate questions tailored to your needs.";
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    let index = 0;
+
+    if (isOpen) {
+      setTypedText(""); // Reset on open
+
+      interval = setInterval(() => {
+        index++;
+        setTypedText(typingText.slice(0, index)); // Use slice to avoid race conditions
+
+        if (index >= typingText.length) {
+          clearInterval(interval);
+        }
+      }, 25);
+    } else {
+      setTypedText(""); // Reset on close
+    }
+
+    return () => clearInterval(interval); // Cleanup
+  }, [isOpen]);
 
   const startRecording = async () => {
     try {
@@ -112,22 +138,22 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({
 
   return (
     <>
-      <Button
+      <div
         onClick={() => setIsOpen(true)}
-        variant="outline"
-        size="sm"
-        className="fixed bottom-6 right-6 z-50 shadow-lg"
+        className="bg-transparent fixed bottom-6 right-6 z-50 flex flex-col items-center gap-2 cursor-pointer"
       >
-        <MessageSquare className="w-4 h-4 mr-2" />
-        Infero Mentor
-      </Button>
+        <img src="/ai-assistant.svg" alt="Robot" className="w-40 h-40" />
+        <span className="absolute top-[120px] text-sm font-semibold text-gray-700">
+          Infera Buddy
+        </span>
+      </div>
 
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                Share Your Feedback
+                Tell us what you want to practice
               </h3>
               <Button variant="ghost" size="sm" onClick={handleClose}>
                 <X className="w-4 h-4" />
@@ -135,7 +161,10 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
+              <div className="text-sm text-gray-700 mb-4">
+                {typedText?.length > 0 && <p>{typedText}</p>}
+              </div>
+              {/* <div className="flex items-center gap-2">
                 <Button
                   onClick={isRecording ? stopRecording : startRecording}
                   variant={isRecording ? "destructive" : "default"}
@@ -160,10 +189,10 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({
                     Converting speech to text...
                   </span>
                 )}
-              </div>
+              </div> */}
 
               <Textarea
-                placeholder="Type your feedback or use the microphone to record..."
+                placeholder="Type here..."
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}
                 rows={4}
@@ -178,7 +207,7 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({
                   onClick={handleSubmit}
                   disabled={!feedbackText.trim() || isLoading}
                 >
-                  Submit Feedback
+                  Submit
                 </Button>
               </div>
             </div>
