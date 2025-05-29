@@ -14,6 +14,7 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({
   onSubmitFeedback,
 }) => {
   const testId = useQueryParam("testId") as string;
+  const userId = useQueryParam("userId") as string;
   const { fetchNextQuestion } = usePractice();
   const [isOpen, setIsOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -122,8 +123,8 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({
       setIsOpen(false);
 
       // Fetch next question after submitting feedback
-      if (testId) {
-        await fetchNextQuestion(testId, feedbackText.trim());
+      if (testId && userId) {
+        await fetchNextQuestion(testId, userId, feedbackText.trim());
       }
     }
   };

@@ -20,6 +20,7 @@ import {
 
 const QuestionCard: React.FC = () => {
   const testId = useQueryParam("testId") as string;
+  const userId = useQueryParam("userId") as string;
   const { state, submitAnswer, fetchNextQuestion } = usePractice();
   const { currentQuestion } = state;
 
@@ -79,7 +80,7 @@ const QuestionCard: React.FC = () => {
   const handleNextButtonClick = () => {
     setShowResult(false);
     setSelectedOption(null);
-    fetchNextQuestion(testId);
+    fetchNextQuestion(testId, userId);
   };
 
   return (

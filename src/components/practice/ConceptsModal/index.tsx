@@ -10,6 +10,7 @@ const ConceptsModal = ({
   currentJourneyItem,
 }) => {
   const testId = useQueryParam("testId") as string;
+  const userId = useQueryParam("userId") as string;
   const { fetchNextQuestion, state } = usePractice();
 
   return (
@@ -69,7 +70,7 @@ const ConceptsModal = ({
               key={item._id}
               className="p-4 bg-white shadow-md rounded-lg border border-gray-200 hover:shadow-lg transition duration-200 cursor-pointer"
               onClick={() => {
-                fetchNextQuestion(testId, item.title);
+                fetchNextQuestion(testId, userId, item.title);
                 closeModal();
               }}
             >

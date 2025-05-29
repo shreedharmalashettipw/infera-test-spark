@@ -22,6 +22,7 @@ const LeaderboardScreen = () => {
   const [leaders, setLeaders] = useState([]);
   const [podiumData, setPodiumData] = useState([]);
   const testId = useQueryParam("testId") as string;
+  const userId = useQueryParam("userId") as string;
 
   useEffect(() => {
     const fetchLeaders = async () => {
@@ -31,6 +32,7 @@ const LeaderboardScreen = () => {
           {
             params: {
               testId,
+              userId,
             },
             headers: {
               Authorization:

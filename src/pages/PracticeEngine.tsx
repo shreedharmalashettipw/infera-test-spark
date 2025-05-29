@@ -12,6 +12,7 @@ import TestFinishModal from "@/components/practice/TestFinishModal";
 
 const PracticeEngine: React.FC = () => {
   const testId = useQueryParam("testId") as string;
+  const userId = useQueryParam("userId") as string;
   const { fetchNextQuestion, state } = usePractice();
 
   const [isConceptModalOpen, setIsConceptModalOpen] = useState(false);
@@ -37,10 +38,10 @@ const PracticeEngine: React.FC = () => {
   }, [journeyItems]);
 
   useEffect(() => {
-    if (testId) {
-      fetchNextQuestion(testId);
+    if (testId && userId) {
+      fetchNextQuestion(testId, userId);
     }
-  }, [testId]);
+  }, [testId, userId]);
 
   useEffect(() => {
     if (
@@ -71,7 +72,7 @@ const PracticeEngine: React.FC = () => {
                   AI-driven infinite test engine for adaptive learning
                 </p>
               </div>
-              <Link to={`/analytics?testId=${testId}`}>
+              <Link to={`/analytics?testId=${testId}&userId=${userId}`}>
                 <Button className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4" />
                   View Analytics

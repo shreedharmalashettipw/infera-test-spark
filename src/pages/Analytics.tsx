@@ -9,6 +9,7 @@ import { useQueryParam } from "@/hooks/useQueryParam";
 const Analytics: React.FC = () => {
   const { state } = usePractice();
   const testId = useQueryParam("testId") as string;
+  const userId = useQueryParam("userId") as string;
 
   // Transform performance data for chart
   const chartData = state.performance.map((item, index) => ({
@@ -85,7 +86,7 @@ const Analytics: React.FC = () => {
               </div>
             </div>
             <div>
-              <Link to={`/leaderboard?testId=${testId}`}>
+              <Link to={`/leaderboard?testId=${testId}&userId=${userId}`}>
                 <button className="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-200">
                   Leaderboard
                 </button>

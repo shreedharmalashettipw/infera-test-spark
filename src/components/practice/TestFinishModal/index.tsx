@@ -7,9 +7,10 @@ import Confetti from "react-confetti"; // Import Confetti
 const TestFinishModal = ({ isOpen, closeModal }) => {
   const navigate = useNavigate();
   const testId = useQueryParam("testId") as string;
+  const userId = useQueryParam("userId") as string;
 
   const handleNavigateToAnalytics = () => {
-    navigate(`/analytics?testId=${testId}`);
+    navigate(`/analytics?testId=${testId}&userId=${userId}`);
     closeModal();
   };
 

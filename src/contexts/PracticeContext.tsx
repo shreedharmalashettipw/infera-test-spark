@@ -168,7 +168,11 @@ const practiceReducer = (
 const PracticeContext = createContext<{
   state: PracticeState;
   dispatch: React.Dispatch<PracticeAction>;
-  fetchNextQuestion: (testId: string, userFeedback?: string) => Promise<void>;
+  fetchNextQuestion: (
+    testId: string,
+    userId: string,
+    userFeedback?: string
+  ) => Promise<void>;
   submitAnswer: (
     answerIndex: number,
     shouldCompleteJourney?: boolean
@@ -274,12 +278,16 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  const fetchNextQuestion = async (testId: string, userFeedback?: string) => {
+  const fetchNextQuestion = async (
+    testId: string,
+    userId: string,
+    userFeedback?: string
+  ) => {
     dispatch({ type: "SET_LOADING", payload: true });
     dispatch({ type: "SET_CURRENT_QUESTION", payload: null });
 
     try {
-      const params: any = { testId };
+      const params: any = { testId, userId };
       if (userFeedback) {
         params.userFeedback = userFeedback;
       }
