@@ -171,9 +171,11 @@ const PracticeEngine: React.FC = () => {
             maxHeight: "80vh",
             overflowY: "auto",
             boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
+            zIndex: 1050,
           },
           overlay: {
             backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 1040,
           },
         }}
       >
