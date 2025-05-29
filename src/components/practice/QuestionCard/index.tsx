@@ -56,7 +56,7 @@ const QuestionCard: React.FC = () => {
 
     // Otherwise, submit directly
     setShowResult(true);
-    await submitAnswer(optionIndex);
+    await submitAnswer(optionIndex, userId);
   };
 
   const handleCompleteJourney = async () => {
@@ -64,7 +64,7 @@ const QuestionCard: React.FC = () => {
 
     setShowCompletionDialog(false);
     setShowResult(true);
-    await submitAnswer(pendingAnswerIndex, true);
+    await submitAnswer(pendingAnswerIndex, userId, true);
     setPendingAnswerIndex(null);
   };
 
@@ -73,7 +73,7 @@ const QuestionCard: React.FC = () => {
 
     setShowCompletionDialog(false);
     setShowResult(true);
-    await submitAnswer(pendingAnswerIndex, false);
+    await submitAnswer(pendingAnswerIndex, userId, false);
     setPendingAnswerIndex(null);
   };
 

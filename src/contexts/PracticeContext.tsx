@@ -175,6 +175,7 @@ const PracticeContext = createContext<{
   ) => Promise<void>;
   submitAnswer: (
     answerIndex: number,
+    userId: string,
     shouldCompleteJourney?: boolean
   ) => Promise<void>;
 } | null>(null);
@@ -328,6 +329,7 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
   const getSubmitPayload = (
     data: Question,
     answerIndex: number,
+    userId: string,
     shouldCompleteJourney?: boolean
   ) => {
     const {
@@ -358,11 +360,13 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
       selectedOptions: [options[answerIndex].id],
       completeJourneyItem:
         canBeCompleted && shouldCompleteJourney ? journeyItemId : null,
+      userId,
     };
   };
 
   const submitAnswer = async (
     answerIndex: number,
+    userId: string,
     shouldCompleteJourney?: boolean
   ) => {
     if (!state.currentQuestion) return;
@@ -370,6 +374,7 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
     const submitPayload = getSubmitPayload(
       state.currentQuestion,
       answerIndex,
+      userId,
       shouldCompleteJourney
     );
     try {
