@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { usePractice } from "@/contexts/PracticeContext";
 import { Link } from "react-router-dom";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import FilterBar from "@/components/practice/FilterBar";
 import PerformanceStats from "@/components/practice/PerformanceStats";
 import QuestionCard from "@/components/practice/QuestionCard";
+import JourneyProgressBar from "@/components/practice/JourneyProgressBar";
 import { useQueryParam } from "@/hooks/useQueryParam";
 
 const PracticeEngine: React.FC = () => {
@@ -44,6 +46,9 @@ const PracticeEngine: React.FC = () => {
           <PerformanceStats />
         </div>
       </div>
+
+      {/* Journey Progress Bar */}
+      <JourneyProgressBar />
 
       <div className="max-w-7xl mx-auto py-8">
         <QuestionCard />
