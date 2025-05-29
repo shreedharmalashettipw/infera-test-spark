@@ -3,12 +3,16 @@ import React, { useState, useRef } from "react";
 import { Mic, MicOff, MessageSquare, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { usePractice } from "@/contexts/PracticeContext";
+import { useQueryParam } from "@/hooks/useQueryParam";
 
 interface FeedbackButtonProps {
   onSubmitFeedback: (feedback: string) => void;
 }
 
 const FeedbackButton: React.FC<FeedbackButtonProps> = ({ onSubmitFeedback }) => {
+  const testId = useQueryParam("testId") as string;
+  const { fetchNextQuestion } = usePractice();
   const [isOpen, setIsOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [feedbackText, setFeedbackText] = useState("");
@@ -77,11 +81,16 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({ onSubmitFeedback }) => 
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (feedbackText.trim()) {
       onSubmitFeedback(feedbackText.trim());
       setFeedbackText("");
       setIsOpen(false);
+      
+      // Fetch next question after submitting feedback
+      if (testId) {
+        await fetchNextQuestion(testId, feedbackText.trim());
+      }
     }
   };
 

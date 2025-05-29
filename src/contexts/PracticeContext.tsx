@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, ReactNode } from "react";
 import axios from "axios";
+
 export interface Subject {
   id: string;
   name: string;
@@ -25,12 +26,20 @@ export type OptionType = {
   isCorrect: boolean;
 };
 
+export interface JourneyItem {
+  title: string;
+  note: string;
+  isCompleted: boolean;
+  _id: string;
+}
+
 export type ProgressType = {
   accuracy: number;
   attemptedQuestions: number;
   correctQuestions: number;
   currentStreak: number;
   inCorrectQuestions: number;
+  journeyItems?: JourneyItem[];
 };
 
 export interface Question {

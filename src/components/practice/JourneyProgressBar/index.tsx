@@ -7,12 +7,16 @@ const JourneyProgressBar: React.FC = () => {
   const { state } = usePractice();
   const { currentQuestion } = state;
 
-  if (!currentQuestion?.progress?.journeyItems) {
+  if (!currentQuestion?.progress) {
     return null;
   }
 
   const journeyItems = currentQuestion.progress.journeyItems;
   const currentJourneyItemId = currentQuestion.journeyItemId;
+
+  if (!journeyItems) {
+    return null;
+  }
 
   return (
     <div className="bg-white border-b border-gray-200 py-6">
