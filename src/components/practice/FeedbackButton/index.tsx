@@ -140,9 +140,13 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({
     <>
       <div
         onClick={() => setIsOpen(true)}
-        className="bg-transparent fixed bottom-6 right-6 z-50 flex flex-col items-center gap-2 cursor-pointer"
+        className="bg-transparent fixed bottom-6 left-24 z-50 flex flex-col items-center gap-2 cursor-pointer"
       >
-        <img src="/ai-assistant.svg" alt="Robot" className="w-40 h-40" />
+        <img
+          src="/ai-assistant.svg"
+          alt="Robot"
+          className="w-40 h-40 transition-transform duration-300 ease-in-out hover:scale-110"
+        />
         <span className="absolute top-[120px] text-sm font-semibold text-gray-700">
           Infera Buddy
         </span>

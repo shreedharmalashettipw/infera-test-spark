@@ -56,7 +56,7 @@ const PracticeEngine: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  Beta Version - Practice Engine
+                  Infera - Practice Engine
                 </h1>
                 <p className="text-gray-600 mt-1">
                   AI-driven infinite test engine for adaptive learning
@@ -100,7 +100,7 @@ const PracticeEngine: React.FC = () => {
             {completedJourneyItems?.length > 0 && (
               <div className="w-full h-fit bg-white shadow-md rounded-lg p-4 border border-gray-200">
                 <div className="text-lg font-semibold text-gray-800 mb-2">
-                  Completed Journey Items
+                  Completed Concepts
                 </div>
                 <div
                   className="overflow-y-auto max-h-[400px] space-y-4"
@@ -144,7 +144,11 @@ const PracticeEngine: React.FC = () => {
               </span>
             </div>
           )}
-          <QuestionCard />
+          <QuestionCard
+          // isCurrentJourneyItemShown={
+          //   currentJourneyItem || completedJourneyItems?.length > 0
+          // }
+          />
         </div>
       </div>
 
