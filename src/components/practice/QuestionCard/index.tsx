@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Clock, BookOpen, Star, Lightbulb } from "lucide-react";
 import { usePractice } from "@/contexts/PracticeContext";
@@ -27,6 +26,7 @@ const QuestionCard: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  const [pendingAnswerIndex, setPendingAnswerIndex] = useState<number | null>(null);
 
   if (!currentQuestion) {
     return (
@@ -43,33 +43,41 @@ const QuestionCard: React.FC = () => {
     if (showResult) return;
 
     setSelectedOption(optionIndex);
-    setShowResult(true);
 
+    // If the question can be completed, show the completion dialog first
+    if (currentQuestion.canBeCompleted) {
+      setPendingAnswerIndex(optionIndex);
+      setShowCompletionDialog(true);
+      return;
+    }
+
+    // Otherwise, submit directly
+    setShowResult(true);
     await submitAnswer(optionIndex);
   };
 
-  const handleNextButtonClick = () => {
-    if (currentQuestion.canBeCompleted) {
-      setShowCompletionDialog(true);
-    } else {
-      proceedToNextQuestion();
-    }
+  const handleCompleteJourney = async () => {
+    if (pendingAnswerIndex === null) return;
+    
+    setShowCompletionDialog(false);
+    setShowResult(true);
+    await submitAnswer(pendingAnswerIndex, true);
+    setPendingAnswerIndex(null);
   };
 
-  const proceedToNextQuestion = () => {
+  const handleSkipCompletion = async () => {
+    if (pendingAnswerIndex === null) return;
+    
+    setShowCompletionDialog(false);
+    setShowResult(true);
+    await submitAnswer(pendingAnswerIndex, false);
+    setPendingAnswerIndex(null);
+  };
+
+  const handleNextButtonClick = () => {
     setShowResult(false);
     setSelectedOption(null);
     fetchNextQuestion(testId);
-  };
-
-  const handleCompleteJourney = () => {
-    setShowCompletionDialog(false);
-    proceedToNextQuestion();
-  };
-
-  const handleSkipCompletion = () => {
-    setShowCompletionDialog(false);
-    proceedToNextQuestion();
   };
 
   return (
