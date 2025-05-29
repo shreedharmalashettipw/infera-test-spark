@@ -3,22 +3,22 @@ import { usePractice } from "@/contexts/PracticeContext";
 import { Link } from "react-router-dom";
 import { BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import FilterBar from "@/components/practice/FilterBar";
 import PerformanceStats from "@/components/practice/PerformanceStats";
 import QuestionCard from "@/components/practice/QuestionCard";
-import JourneyProgressBar from "@/components/practice/JourneyProgressBar";
 import FeedbackButton from "@/components/practice/FeedbackButton";
 import { useQueryParam } from "@/hooks/useQueryParam";
-import Modal from "react-modal";
+import ConceptsModal from "@/components/practice/ConceptsModal";
+import TestFinishModal from "@/components/practice/TestFinishModal";
 
 const PracticeEngine: React.FC = () => {
   const testId = useQueryParam("testId") as string;
   const { fetchNextQuestion, state } = usePractice();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isConceptModalOpen, setIsConceptModalOpen] = useState(false);
+  const [isTestFinishModalOpen, setIsTestFinishModalOpen] = useState(false);
 
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
+  const openModal = () => setIsConceptModalOpen(true);
+  const closeModal = () => setIsConceptModalOpen(false);
 
   const journeyItems = state.currentQuestion?.progress?.journeyItems || [];
 
@@ -41,6 +41,15 @@ const PracticeEngine: React.FC = () => {
       fetchNextQuestion(testId);
     }
   }, [testId]);
+
+  useEffect(() => {
+    if (
+      journeyItems.length > 0 &&
+      journeyItems.every((item) => item.isCompleted)
+    ) {
+      setIsTestFinishModalOpen(true);
+    }
+  }, [journeyItems]);
 
   const handleFeedbackSubmit = (feedback: string) => {
     console.log("User feedback:", feedback);
@@ -157,74 +166,16 @@ const PracticeEngine: React.FC = () => {
 
       {/* Feedback Button */}
       <FeedbackButton onSubmitFeedback={handleFeedbackSubmit} />
-      <Modal
-        isOpen={isOpen}
-        onRequestClose={closeModal}
-        contentLabel="Journey Items Modal"
-        style={{
-          content: {
-            top: "50%",
-            left: "50%",
-            right: "auto",
-            bottom: "auto",
-            transform: "translate(-50%, -50%)",
-            padding: "20px",
-            borderRadius: "12px",
-            width: "500px",
-            maxHeight: "80vh",
-            overflowY: "auto",
-            boxShadow: "0 8px 30px rgba(0,0,0,0.2)",
-            zIndex: 1050,
-          },
-          overlay: {
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            zIndex: 1040,
-          },
-        }}
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Journey Items</h2>
-          <button
-            onClick={closeModal}
-            className="text-gray-600 hover:text-gray-800 transition duration-200"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <div className="grid grid-cols-1 gap-4">
-          {journeyItems
-            .filter((item) => item._id !== currentJourneyItem._id)
-            .filter((item) => !item.isCompleted)
-            .map((item) => (
-              <div
-                key={item._id}
-                className="p-4 bg-white shadow-md rounded-lg border border-gray-200 hover:shadow-lg transition duration-200 cursor-pointer"
-                onClick={() => {
-                  fetchNextQuestion(testId, item.title);
-                  closeModal();
-                }}
-              >
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-gray-600">{item.note}</p>
-              </div>
-            ))}
-        </div>
-      </Modal>
+      <ConceptsModal
+        isOpen={isConceptModalOpen}
+        closeModal={closeModal}
+        currentJourneyItem={currentJourneyItem}
+        journeyItems={journeyItems}
+      />
+      <TestFinishModal
+        isOpen={isTestFinishModalOpen}
+        closeModal={() => setIsTestFinishModalOpen(false)}
+      />
     </div>
   );
 };
