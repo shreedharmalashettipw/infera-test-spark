@@ -1,25 +1,13 @@
-const podiumData = [
-  {
-    position: "2nd",
-    gradient: "bg-gradient-to-b from-purple-500 to-purple-700",
-    avatar: "https://i.pravatar.cc/80?img=32",
-  },
-  {
-    position: "1st",
-    gradient: "bg-gradient-to-b from-yellow-500 to-yellow-600",
-    avatar: "https://i.pravatar.cc/80?img=12",
-  },
-  {
-    position: "3rd",
-    gradient: "bg-gradient-to-b from-purple-700 to-purple-900",
-    avatar: "https://i.pravatar.cc/80?img=45",
-  },
-];
+import React from "react";
 
-export default function Podium() {
+type PodiumItem = {
+  data: { gradient: string; position: string; avatar: string; name: string }[];
+};
+
+const Podium: React.FC<PodiumItem> = ({ data }) => {
   return (
     <div className="flex justify-center items-end bg-gray-900 px-8">
-      {podiumData.map((item, idx) => (
+      {data.map((item, idx) => (
         <div
           key={idx}
           className={`flex flex-col items-center mx-4 ${
@@ -31,21 +19,28 @@ export default function Podium() {
               idx === 1 ? "h-64" : "h-52"
             } relative flex flex-col items-center pt-4`}
           >
-            {/* Laurel wreath */}
             <div className="absolute top-2">
               <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
                 {item.position.toUpperCase()}
               </span>
             </div>
-            {/* Avatar overlapping bottom */}
-            <img
-              src={item.avatar}
-              alt="avatar"
-              className={`absolute w-20 h-20 rounded-full border-4 border-white shadow-lg bottom-[-2.5rem]`}
-            />
+            <div
+              className={`absolute w-20 h-20 rounded-full border-4 border-white shadow-lg bottom-[-2.5rem] bg-gray-500 flex items-center justify-center text-white font-bold text-lg`}
+            >
+              {item.name
+                .split(" ")
+                .map((word) => word[0])
+                .join("")
+                .toUpperCase()}
+            </div>
+            <span className="mt-16 text-sm font-medium text-white">
+              {item.name}
+            </span>
           </div>
         </div>
       ))}
     </div>
   );
-}
+};
+
+export default Podium;

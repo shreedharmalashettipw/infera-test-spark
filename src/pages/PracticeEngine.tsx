@@ -62,7 +62,7 @@ const PracticeEngine: React.FC = () => {
                   AI-driven infinite test engine for adaptive learning
                 </p>
               </div>
-              <Link to="/analytics">
+              <Link to={`/analytics?testId=${testId}`}>
                 <Button className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4" />
                   View Analytics
