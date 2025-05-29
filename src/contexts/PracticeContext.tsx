@@ -168,7 +168,7 @@ const PracticeContext = createContext<{
   state: PracticeState;
   dispatch: React.Dispatch<PracticeAction>;
   fetchNextQuestion: (testId: string, userFeedback?: string) => Promise<void>;
-  submitAnswer: (answerIndex: number) => Promise<void>;
+  submitAnswer: (answerIndex: number, shouldCompleteJourney?: boolean) => Promise<void>;
 } | null>(null);
 
 export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
@@ -313,7 +313,7 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const getSubmitPayload = (data: Question, answerIndex: number) => {
+  const getSubmitPayload = (data: Question, answerIndex: number, shouldCompleteJourney?: boolean) => {
     const {
       questionNumber,
       text,
@@ -340,14 +340,14 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
       options,
       status: isCorrect ? "Correct" : "Incorrect",
       selectedOptions: [options[answerIndex].id],
-      completeJourneyItem: canBeCompleted ? journeyItemId : null,
+      completeJourneyItem: (canBeCompleted && shouldCompleteJourney) ? journeyItemId : null,
     };
   };
 
-  const submitAnswer = async (answerIndex: number) => {
+  const submitAnswer = async (answerIndex: number, shouldCompleteJourney?: boolean) => {
     if (!state.currentQuestion) return;
 
-    const submitPayload = getSubmitPayload(state.currentQuestion, answerIndex);
+    const submitPayload = getSubmitPayload(state.currentQuestion, answerIndex, shouldCompleteJourney);
     try {
       const response = await axios.post(
         "https://stage-api.penpencil.co/v3/test-service/infera-practice/submit-question",
