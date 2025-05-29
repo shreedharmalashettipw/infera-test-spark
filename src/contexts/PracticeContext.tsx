@@ -167,7 +167,7 @@ const practiceReducer = (
 const PracticeContext = createContext<{
   state: PracticeState;
   dispatch: React.Dispatch<PracticeAction>;
-  fetchNextQuestion: (testId: string) => Promise<void>;
+  fetchNextQuestion: (testId: string, userFeedback?: string) => Promise<void>;
   submitAnswer: (answerIndex: number) => Promise<void>;
 } | null>(null);
 
@@ -270,18 +270,21 @@ export const PracticeProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  const fetchNextQuestion = async (testId: string) => {
+  const fetchNextQuestion = async (testId: string, userFeedback?: string) => {
     dispatch({ type: "SET_LOADING", payload: true });
     dispatch({ type: "SET_CURRENT_QUESTION", payload: null });
 
     try {
+      const params: any = { testId };
+      if (userFeedback) {
+        params.userFeedback = userFeedback;
+      }
+
       // Replace 'API_URL' with the actual endpoint for fetching the next question
       const response = await axios.get(
         "https://stage-api.penpencil.co/v3/test-service/test-categories/infera-practice/next-question",
         {
-          params: {
-            testId,
-          },
+          params,
           headers: {
             Authorization:
               "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3NDkwMzAwMjYuNjA2LCJkYXRhIjp7Il9pZCI6IjY1YThlM2NhNDM2NzQ5NmNlNjVjMTU4MSIsInVzZXJuYW1lIjoiNzk4MjE3MzUyMyIsImZpcnN0TmFtZSI6IlJhamEiLCJsYXN0TmFtZSI6IkJoYW5kYXJkZSIsIm9yZ2FuaXphdGlvbiI6eyJfaWQiOiI1ZWIzOTNlZTk1ZmFiNzQ2OGE3OWQxODkiLCJ3ZWJzaXRlIjoicGh5c2ljc3dhbGxhaC5jb20iLCJuYW1lIjoiUGh5c2ljc3dhbGxhaCJ9LCJlbWFpbCI6InJhamFAcHcubGl2ZSIsInJvbGVzIjpbIjViMmI5NzQyNzY0YmQ1MTliZWI5MGFjMiJdLCJjb3VudHJ5R3JvdXAiOiJJTiIsInR5cGUiOiJVU0VSIn0sImlhdCI6MTc0ODQyNTIyNn0.OKNVRduYPzxVN0L40_Vm9ARN5wXZfbAcnXvsk4PbIQs",
